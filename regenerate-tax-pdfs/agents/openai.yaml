@@ -1,0 +1,4 @@
+interface:
+  display_name: "Regenerate Tax PDFs"
+  short_description: "Regenerate filled tax PDFs"
+  default_prompt: "Use $regenerate-tax-pdfs to regenerate filled tax PDFs from my edited extracted_tax_data.yaml."

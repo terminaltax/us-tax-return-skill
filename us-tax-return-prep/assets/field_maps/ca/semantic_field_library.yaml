@@ -1,0 +1,108 @@
+schema_version: "0.1"
+description: "Semantic field-map targets for California resident forms. Use these suggestions after inspecting the current fillable FTB PDF field names."
+forms:
+  ca540:
+    title: "California Form 540"
+    pdf_pattern: "{tax_year}-540.pdf"
+    targets:
+      taxpayer_primary_name:
+        path: "taxpayer.primary.full_name"
+        format: "text"
+      taxpayer_spouse_name:
+        path: "taxpayer.spouse.full_name"
+        format: "text"
+      taxpayer_address:
+        template: "{taxpayer.address.line1}, {taxpayer.address.city}, {taxpayer.address.state} {taxpayer.address.zip}"
+        format: "text"
+      filing_status:
+        path: "taxpayer.filing_status"
+        format: "text"
+      line_12:
+        path: "calculated.form_line_values.ca540.line_12_state_wages"
+        format: "money_whole_dollars"
+      line_13:
+        path: "calculated.form_line_values.ca540.line_13_federal_agi"
+        format: "money_whole_dollars"
+      line_14:
+        path: "calculated.form_line_values.ca540.line_14_ca_adjustments_subtractions"
+        format: "money_whole_dollars"
+      line_15:
+        path: "calculated.form_line_values.ca540.line_15_subtotal"
+        format: "money_whole_dollars"
+      line_16:
+        path: "calculated.form_line_values.ca540.line_16_ca_adjustments_additions"
+        format: "money_whole_dollars"
+      line_17:
+        path: "calculated.form_line_values.ca540.line_17_ca_adjusted_gross_income"
+        format: "money_whole_dollars"
+      line_18:
+        path: "calculated.form_line_values.ca540.line_18_standard_or_itemized_deduction"
+        format: "money_whole_dollars"
+      line_19:
+        path: "calculated.form_line_values.ca540.line_19_taxable_income"
+        format: "money_whole_dollars"
+      line_31:
+        path: "calculated.form_line_values.ca540.line_31_tax"
+        format: "money_whole_dollars"
+      line_32:
+        path: "calculated.form_line_values.ca540.line_32_exemption_credits"
+        format: "money_whole_dollars"
+      line_35:
+        path: "calculated.form_line_values.ca540.line_35_tax_after_exemption_credits"
+        format: "money_whole_dollars"
+      line_48:
+        path: "calculated.form_line_values.ca540.line_48_total_nonrefundable_credits"
+        format: "money_whole_dollars"
+      line_61:
+        path: "calculated.form_line_values.ca540.line_61_alternative_minimum_tax"
+        format: "money_whole_dollars"
+      line_62:
+        path: "calculated.form_line_values.ca540.line_62_mental_health_services_tax"
+        format: "money_whole_dollars"
+      line_63:
+        path: "calculated.form_line_values.ca540.line_63_other_taxes_and_credit_recapture"
+        format: "money_whole_dollars"
+      line_64:
+        path: "calculated.form_line_values.ca540.line_64_total_tax"
+        format: "money_whole_dollars"
+      line_71:
+        path: "calculated.form_line_values.ca540.line_71_ca_income_tax_withheld"
+        format: "money_whole_dollars"
+      line_72:
+        path: "calculated.form_line_values.ca540.line_72_ca_estimated_tax_payments"
+        format: "money_whole_dollars"
+      line_73:
+        path: "calculated.form_line_values.ca540.line_73_extension_payment"
+        format: "money_whole_dollars"
+  ca540ca:
+    title: "Schedule CA (540)"
+    pdf_pattern: "{tax_year}-540-ca.pdf"
+    targets:
+      part_i_line_1a:
+        path: "calculated.form_line_values.ca540ca.part_i_line_1a_federal_wages"
+        format: "money_whole_dollars"
+      part_i_line_2b:
+        path: "calculated.form_line_values.ca540ca.part_i_line_2b_federal_taxable_interest"
+        format: "money_whole_dollars"
+      part_i_line_3b:
+        path: "calculated.form_line_values.ca540ca.part_i_line_3b_federal_ordinary_dividends"
+        format: "money_whole_dollars"
+      part_i_line_7:
+        path: "calculated.form_line_values.ca540ca.part_i_line_7_federal_capital_gain_or_loss"
+        format: "money_whole_dollars"
+      part_i_line_8:
+        path: "calculated.form_line_values.ca540ca.part_i_line_8_federal_additional_income"
+        format: "money_whole_dollars"
+      part_i_line_27_column_b:
+        path: "calculated.form_line_values.ca540ca.part_i_line_27_subtractions_total"
+        format: "money_whole_dollars"
+      part_i_line_27_column_c:
+        path: "calculated.form_line_values.ca540ca.part_i_line_27_additions_total"
+        format: "money_whole_dollars"
+  ca540d:
+    title: "Schedule D (540)"
+    pdf_pattern: "{tax_year}-540-d.pdf"
+    targets:
+      capital_gain_review_note:
+        path: "state_adjustments.ca.capital_gains.review_note"
+        format: "text"

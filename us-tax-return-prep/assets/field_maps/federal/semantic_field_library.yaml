@@ -1,0 +1,451 @@
+schema_version: "0.1"
+description: "Semantic field-map targets for common federal forms. Use these suggestions after inspecting the current fillable PDF field names."
+forms:
+  f1040:
+    title: "Form 1040"
+    pdf: "f1040.pdf"
+    targets:
+      taxpayer_primary_name:
+        label: "Primary taxpayer name"
+        path: "taxpayer.primary.full_name"
+        format: "text"
+        required: true
+      taxpayer_primary_ssn:
+        label: "Primary taxpayer SSN"
+        path: "taxpayer.primary.ssn"
+        format: "digits"
+        required: true
+      taxpayer_spouse_name:
+        label: "Spouse name"
+        path: "taxpayer.spouse.full_name"
+        format: "text"
+      taxpayer_spouse_ssn:
+        label: "Spouse SSN"
+        path: "taxpayer.spouse.ssn"
+        format: "digits"
+      address:
+        label: "Mailing address"
+        template: "{taxpayer.address.line1} {taxpayer.address.line2}, {taxpayer.address.city}, {taxpayer.address.state} {taxpayer.address.zip}"
+        format: "text"
+        required: true
+      filing_status_single:
+        label: "Single filing status checkbox"
+        path: "taxpayer.filing_status"
+        type: "checkbox"
+        required: true
+      line_1a:
+        label: "Total wages"
+        path: "calculated.form_line_values.f1040.line_1a"
+        format: "money_whole_dollars"
+      line_2a:
+        label: "Tax-exempt interest"
+        path: "calculated.form_line_values.f1040.line_2a"
+        format: "money_whole_dollars"
+      line_2b:
+        label: "Taxable interest"
+        path: "calculated.form_line_values.f1040.line_2b"
+        format: "money_whole_dollars"
+      line_3a:
+        label: "Qualified dividends"
+        path: "calculated.form_line_values.f1040.line_3a"
+        format: "money_whole_dollars"
+      line_3b:
+        label: "Ordinary dividends"
+        path: "calculated.form_line_values.f1040.line_3b"
+        format: "money_whole_dollars"
+      line_7:
+        label: "Capital gain or loss"
+        path: "calculated.form_line_values.f1040.line_7"
+        format: "money_whole_dollars"
+      line_8:
+        label: "Additional income from Schedule 1"
+        path: "calculated.form_line_values.f1040.line_8"
+        format: "money_whole_dollars"
+      line_9:
+        label: "Total income"
+        path: "calculated.form_line_values.f1040.line_9_total_income"
+        format: "money_whole_dollars"
+      line_11:
+        label: "Adjusted gross income"
+        path: "calculated.form_line_values.f1040.line_11_adjusted_gross_income"
+        format: "money_whole_dollars"
+      line_12:
+        label: "Standard or itemized deduction"
+        path: "calculated.form_line_values.f1040.line_12_standard_or_itemized_deduction"
+        format: "money_whole_dollars"
+      line_14:
+        label: "Total deductions"
+        path: "calculated.form_line_values.f1040.line_14_total_deductions"
+        format: "money_whole_dollars"
+      line_15:
+        label: "Taxable income"
+        path: "calculated.form_line_values.f1040.line_15_taxable_income"
+        format: "money_whole_dollars"
+      line_16:
+        label: "Tax"
+        path: "calculated.form_line_values.f1040.line_16_tax"
+        format: "money_whole_dollars"
+      line_24:
+        label: "Total tax"
+        path: "calculated.form_line_values.f1040.line_24_total_tax"
+        format: "money_whole_dollars"
+      line_25a:
+        label: "W-2 withholding"
+        path: "calculated.form_line_values.f1040.line_25a_federal_income_tax_withheld_from_w2"
+        format: "money_whole_dollars"
+      line_25b:
+        label: "1099 withholding"
+        path: "calculated.form_line_values.f1040.line_25b_federal_income_tax_withheld_from_1099"
+        format: "money_whole_dollars"
+      line_25c:
+        label: "Other withholding"
+        path: "calculated.form_line_values.f1040.line_25c_other_federal_income_tax_withheld"
+        format: "money_whole_dollars"
+      line_25d:
+        label: "Total withholding"
+        path: "calculated.form_line_values.f1040.line_25d_total_federal_income_tax_withheld"
+        format: "money_whole_dollars"
+      line_26:
+        label: "Estimated tax payments"
+        path: "calculated.form_line_values.f1040.line_26_estimated_tax_payments"
+        format: "money_whole_dollars"
+      line_33:
+        label: "Total payments"
+        path: "calculated.form_line_values.f1040.line_33_total_payments"
+        format: "money_whole_dollars"
+      line_34:
+        label: "Overpaid"
+        path: "calculated.form_line_values.f1040.line_34_overpaid"
+        format: "money_whole_dollars"
+      line_37:
+        label: "Amount owed"
+        path: "calculated.form_line_values.f1040.line_37_amount_owed"
+        format: "money_whole_dollars"
+  f1040sa:
+    title: "Schedule A (Form 1040)"
+    pdf: "f1040sa.pdf"
+    targets:
+      line_1:
+        label: "Medical and dental expenses"
+        path: "calculated.form_line_values.f1040sa.line_1_medical_and_dental_expenses"
+        format: "money_whole_dollars"
+      line_4:
+        label: "Medical deduction"
+        path: "calculated.form_line_values.f1040sa.line_4_medical_deduction"
+        format: "money_whole_dollars"
+      line_5a:
+        label: "State and local income or sales taxes"
+        path: "calculated.form_line_values.f1040sa.line_5a_state_local_income_or_sales_taxes"
+        format: "money_whole_dollars"
+      line_5e:
+        label: "State and local tax deduction"
+        path: "calculated.form_line_values.f1040sa.line_5e_state_and_local_tax_deduction"
+        format: "money_whole_dollars"
+      line_8a:
+        label: "Home mortgage interest from Form 1098"
+        path: "calculated.form_line_values.f1040sa.line_8a_home_mortgage_interest_form_1098"
+        format: "money_whole_dollars"
+      line_10:
+        label: "Total interest"
+        path: "calculated.form_line_values.f1040sa.line_10_total_interest"
+        format: "money_whole_dollars"
+      line_11:
+        label: "Gifts by cash or check"
+        path: "calculated.form_line_values.f1040sa.line_11_gifts_by_cash_or_check"
+        format: "money_whole_dollars"
+      line_12:
+        label: "Gifts other than cash or check"
+        path: "calculated.form_line_values.f1040sa.line_12_other_than_cash_or_check"
+        format: "money_whole_dollars"
+      line_14:
+        label: "Total gifts to charity"
+        path: "calculated.form_line_values.f1040sa.line_14_total_gifts_to_charity"
+        format: "money_whole_dollars"
+      line_15:
+        label: "Casualty and theft loss"
+        path: "calculated.form_line_values.f1040sa.line_15_casualty_and_theft_loss"
+        format: "money_whole_dollars"
+      line_16:
+        label: "Other itemized deductions"
+        path: "calculated.form_line_values.f1040sa.line_16_other_itemized_deductions"
+        format: "money_whole_dollars"
+      line_17:
+        label: "Total itemized deductions"
+        path: "calculated.form_line_values.f1040sa.line_17_total_itemized_deductions"
+        format: "money_whole_dollars"
+  f1040s1:
+    title: "Schedule 1 (Form 1040)"
+    pdf: "f1040s1.pdf"
+    targets:
+      line_3:
+        label: "Business income or loss"
+        path: "calculated.form_line_values.f1040s1.line_3_business_income_or_loss"
+        format: "money_whole_dollars"
+      line_5:
+        label: "Rental, royalty, partnership, estate, trust income or loss"
+        path: "calculated.form_line_values.f1040s1.line_5_rental_royalty_partnerships_estates_trusts"
+        format: "money_whole_dollars"
+      line_8z:
+        label: "Other income"
+        path: "calculated.form_line_values.f1040s1.line_8z_other_income"
+        format: "money_whole_dollars"
+      line_10:
+        label: "Additional income total"
+        path: "calculated.form_line_values.f1040s1.line_10_additional_income_total"
+        format: "money_whole_dollars"
+      line_26:
+        label: "Adjustments to income"
+        path: "calculated.form_line_values.f1040s1.line_26_adjustments_to_income"
+        format: "money_whole_dollars"
+  f1040s3:
+    title: "Schedule 3 (Form 1040)"
+    pdf: "f1040s3.pdf"
+    targets:
+      line_8:
+        label: "Total other credits"
+        path: "calculated.form_line_values.f1040s3.line_8_total_other_credits"
+        format: "money_whole_dollars"
+      line_10:
+        label: "Amount paid with extension"
+        path: "calculated.form_line_values.f1040s3.line_10_amount_paid_with_extension"
+        format: "money_whole_dollars"
+  f1040sd:
+    title: "Schedule D (Form 1040)"
+    pdf: "f1040sd.pdf"
+    targets:
+      line_7:
+        label: "Short-term capital gain or loss"
+        path: "calculated.form_line_values.f1040sd.line_7"
+        format: "money_whole_dollars"
+      line_15:
+        label: "Long-term capital gain or loss"
+        path: "calculated.form_line_values.f1040sd.line_15"
+        format: "money_whole_dollars"
+      line_16:
+        label: "Combined capital gain or loss"
+        path: "calculated.form_line_values.f1040sd.line_16"
+        format: "money_whole_dollars"
+      line_21:
+        label: "Capital gain or loss to Form 1040"
+        path: "calculated.form_line_values.f1040sd.line_21_to_form_1040"
+        format: "money_whole_dollars"
+  f1040sc:
+    title: "Schedule C (Form 1040)"
+    pdf: "f1040sc.pdf"
+    targets:
+      gross_receipts:
+        label: "Gross receipts"
+        path: "calculated.form_line_values.f1040sc.gross_receipts"
+        format: "money_whole_dollars"
+      net_profit_or_loss:
+        label: "Net profit or loss"
+        path: "calculated.form_line_values.f1040sc.net_profit_or_loss"
+        format: "money_whole_dollars"
+  f1040se:
+    title: "Schedule E (Form 1040)"
+    pdf: "f1040se.pdf"
+    targets:
+      taxpayer_name:
+        label: "Taxpayer name"
+        join:
+          paths:
+            - "taxpayer.primary.full_name"
+            - "taxpayer.spouse.full_name"
+          separator: " & "
+        format: "text"
+      taxpayer_ssn:
+        label: "Taxpayer SSN"
+        path: "taxpayer.primary.ssn"
+        format: "digits"
+      property_a_address:
+        label: "Property A physical address"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_1a_physical_address"
+        format: "text"
+      property_a_type:
+        label: "Property A type code"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_1b_type_of_property"
+        format: "text"
+      property_a_fair_rental_days:
+        label: "Property A fair rental days"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_2_fair_rental_days"
+        format: "integer"
+      property_a_personal_use_days:
+        label: "Property A personal use days"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_2_personal_use_days"
+        format: "integer"
+      property_a_rents:
+        label: "Property A rents received"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_3_rents_received"
+        format: "money_whole_dollars"
+      property_a_royalties:
+        label: "Property A royalties received"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_4_royalties_received"
+        format: "money_whole_dollars"
+      property_a_advertising:
+        label: "Property A advertising"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_5_advertising"
+        format: "money_whole_dollars"
+      property_a_auto_and_travel:
+        label: "Property A auto and travel"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_6_auto_and_travel"
+        format: "money_whole_dollars"
+      property_a_cleaning_and_maintenance:
+        label: "Property A cleaning and maintenance"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_7_cleaning_and_maintenance"
+        format: "money_whole_dollars"
+      property_a_commissions:
+        label: "Property A commissions"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_8_commissions"
+        format: "money_whole_dollars"
+      property_a_insurance:
+        label: "Property A insurance"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_9_insurance"
+        format: "money_whole_dollars"
+      property_a_legal_and_professional:
+        label: "Property A legal and professional fees"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_10_legal_and_professional_fees"
+        format: "money_whole_dollars"
+      property_a_management_fees:
+        label: "Property A management fees"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_11_management_fees"
+        format: "money_whole_dollars"
+      property_a_mortgage_interest:
+        label: "Property A mortgage interest"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_12_mortgage_interest"
+        format: "money_whole_dollars"
+      property_a_other_interest:
+        label: "Property A other interest"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_13_other_interest"
+        format: "money_whole_dollars"
+      property_a_repairs:
+        label: "Property A repairs"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_14_repairs"
+        format: "money_whole_dollars"
+      property_a_supplies:
+        label: "Property A supplies"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_15_supplies"
+        format: "money_whole_dollars"
+      property_a_taxes:
+        label: "Property A taxes"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_16_taxes"
+        format: "money_whole_dollars"
+      property_a_utilities:
+        label: "Property A utilities"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_17_utilities"
+        format: "money_whole_dollars"
+      property_a_depreciation:
+        label: "Property A depreciation or depletion"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_18_depreciation_or_depletion"
+        format: "money_whole_dollars"
+      property_a_other_expense_description:
+        label: "Property A other expense description"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_19_other_description"
+        format: "text"
+      property_a_other_expense:
+        label: "Property A other expense"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_19_other"
+        format: "money_whole_dollars"
+      property_a_total_expenses:
+        label: "Property A total expenses"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_20_total_expenses"
+        format: "money_whole_dollars"
+      property_a_income_or_loss:
+        label: "Property A income or loss"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_21_income_or_loss"
+        format: "money_whole_dollars"
+      property_a_allowed_loss:
+        label: "Property A deductible rental real estate loss after limitation"
+        path: "calculated.form_line_values.f1040se.part_i.properties.a.line_22_deductible_rental_real_estate_loss_after_limitation"
+        format: "money_whole_dollars"
+      line_23a:
+        label: "Total rents"
+        path: "calculated.form_line_values.f1040se.part_i.line_23a_total_rents"
+        format: "money_whole_dollars"
+      line_23b:
+        label: "Total royalties"
+        path: "calculated.form_line_values.f1040se.part_i.line_23b_total_royalties"
+        format: "money_whole_dollars"
+      line_23c:
+        label: "Total mortgage interest"
+        path: "calculated.form_line_values.f1040se.part_i.line_23c_total_mortgage_interest"
+        format: "money_whole_dollars"
+      line_23d:
+        label: "Total depreciation"
+        path: "calculated.form_line_values.f1040se.part_i.line_23d_total_depreciation"
+        format: "money_whole_dollars"
+      line_23e:
+        label: "Total expenses"
+        path: "calculated.form_line_values.f1040se.part_i.line_23e_total_expenses"
+        format: "money_whole_dollars"
+      line_24:
+        label: "Rental income"
+        path: "calculated.form_line_values.f1040se.part_i.line_24_income"
+        format: "money_whole_dollars"
+      line_25:
+        label: "Rental losses"
+        path: "calculated.form_line_values.f1040se.part_i.line_25_losses"
+        format: "money_whole_dollars"
+      line_26:
+        label: "Total rental real estate and royalty income or loss"
+        path: "calculated.form_line_values.f1040se.part_i.line_26_total_rental_real_estate_and_royalty_income_or_loss"
+        format: "money_whole_dollars"
+      line_41:
+        label: "Total income or loss"
+        path: "calculated.form_line_values.f1040se.line_41_total_income_or_loss"
+        format: "money_whole_dollars"
+  f8582:
+    title: "Form 8582"
+    pdf: "f8582.pdf"
+    targets:
+      taxpayer_name:
+        label: "Taxpayer name"
+        join:
+          paths:
+            - "taxpayer.primary.full_name"
+            - "taxpayer.spouse.full_name"
+          separator: " & "
+        format: "text"
+      taxpayer_ssn:
+        label: "Taxpayer SSN"
+        path: "taxpayer.primary.ssn"
+        format: "digits"
+      line_1b:
+        label: "Active rental real estate net loss"
+        path: "calculated.form_line_values.f8582.part_i.line_1b_active_rental_net_loss"
+        format: "money_whole_dollars"
+      line_1d:
+        label: "Active rental real estate combined amount"
+        path: "calculated.form_line_values.f8582.part_i.line_1d_active_rental_combined"
+        format: "money_whole_dollars"
+      line_3:
+        label: "Total passive activity loss"
+        path: "calculated.form_line_values.f8582.part_i.line_3_total_passive_activity_loss"
+        format: "money_whole_dollars"
+      line_6:
+        label: "Modified adjusted gross income"
+        path: "calculated.form_line_values.f8582.part_ii.line_6_modified_adjusted_gross_income"
+        format: "money_whole_dollars"
+      line_8:
+        label: "Special allowance limit"
+        path: "calculated.form_line_values.f8582.part_ii.line_8_special_allowance_limit"
+        format: "money_whole_dollars"
+      line_9:
+        label: "Special allowance"
+        path: "calculated.form_line_values.f8582.part_ii.line_9_special_allowance"
+        format: "money_whole_dollars"
+      line_11:
+        label: "Total losses allowed"
+        path: "calculated.form_line_values.f8582.part_iii.line_11_total_losses_allowed"
+        format: "money_whole_dollars"
+      part_iv_activity_1_name:
+        label: "Part IV activity 1 name"
+        path: "calculated.form_line_values.f8582.part_iv.activities[0].name"
+        format: "text"
+      part_iv_activity_1_net_loss:
+        label: "Part IV activity 1 net loss"
+        path: "calculated.form_line_values.f8582.part_iv.activities[0].net_loss"
+        format: "money_whole_dollars"
+      part_viii_activity_1_allowed_loss:
+        label: "Part VIII activity 1 allowed loss"
+        path: "calculated.form_line_values.f8582.part_viii.activities[0].allowed_loss"
+        format: "money_whole_dollars"

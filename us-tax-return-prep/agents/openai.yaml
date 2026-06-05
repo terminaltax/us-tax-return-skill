@@ -1,0 +1,4 @@
+interface:
+  display_name: "US Tax Return Prep"
+  short_description: "Prepare US tax return forms"
+  default_prompt: "Use $us-tax-return-prep to extract my tax documents into reviewable YAML and fill federal or California state tax forms."
