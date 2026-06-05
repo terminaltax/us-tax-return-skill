@@ -1,9 +1,25 @@
 # US Tax Skill
 
-This workspace contains two Codex skills:
+This skill is for filling US tax returns. 
 
-- `us-tax-return-prep`: end-to-end draft US individual tax return preparation from a folder of tax documents.
-- `regenerate-tax-pdfs`: standalone deterministic PDF regeneration from an edited `extracted_tax_data.yaml`, blank PDFs, and field maps.
+The reason for this to exist is because we actually want AI do the boring stuff that 
+we don't want to do, and do it well.
+
+The overall vision is:
+
+1. I put all my forms (w-2, bank forms, previous tax forms, property taxes whatever you name it) in 
+   a folder, and tell AI to do tax for me.
+2. It will first extract all the data it needs from those forms (this step is the AI's native ability or
+   reading and understanding). Which produce a big big text file of extracted data.
+3. You can spot check the text file with extract data to make sure it's right.
+4. AI uses scripts to do math, and fill in the PDFs. This step is deterministic (logic coded in Python),
+   in particular, the math is powered by OpenTaxSolver so it's more trustworthy than vibe coded math.
+5. PDF forms are filled. You can make edits and file as how you please (online or mail)
+
+## DISCLAIMER:
+
+I, nor the Agent is CPA. So use it on your own risk and double check the forms yourself.
+
 
 These skills create draft preparation artifacts for review. They do not file, sign, mail, e-file, or certify a tax return.
 
@@ -35,237 +51,150 @@ Use the venv interpreter when running scripts directly:
 
 ## End-To-End Use
 
-Start in a folder containing tax documents such as W-2s, 1099s, prior-year returns, and `summary.md`.
+The skill is designed to be used as a conversation with Codex in the folder containing the user's tax documents. The diagram below summarizes the interaction and the main files produced along the way.
 
-```bash
-cd /path/to/tax-packet
-```
+![Tax return interaction diagram](docs/tax-return-interaction.png)
 
-Create the workspace:
+Example full interaction:
 
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/prepare_tax_workspace.py . \
-  --tax-year 2025
-```
+**User:** do tax return in current dir
 
-This creates:
+**Agent:** I’ll use the `us-tax-return-prep` skill. I’ll create the tax workspace, inventory the source documents, and ask you to fill any missing intake files before I calculate or draft PDFs. These are draft preparation artifacts, not a filed return.
+
+**Action:** The agent runs `scripts/prepare_tax_workspace.py . --tax-year 2025`.
+
+**Files generated:**
 
 ```text
-itemized/
-  itemized_intake.md
-rental/
-  rental_intake.md
-tax_forms/
-  extracted_tax_data.yaml
-  required_irs_forms.yaml
-  required_state_forms.yaml
-  source_manifest.yaml
-  review_notes.md
-  federal/
-  state/
-  workpapers/
-    blank_forms/irs/
-    blank_forms/ca/
-    field_maps/
-    field_maps/ca/
+itemized/itemized_intake.md
+rental/rental_intake.md
+tax_forms/extracted_tax_data.yaml
+tax_forms/source_manifest.yaml
+tax_forms/required_irs_forms.yaml
+tax_forms/required_state_forms.yaml
+tax_forms/review_notes.md
+tax_forms/workpapers/
 ```
 
-Use `$us-tax-return-prep` in Codex to classify documents, extract values into `tax_forms/extracted_tax_data.yaml`, and record review notes.
+**Agent:** I found W-2s, brokerage 1099s, a prior-year return, and rental documents. Please open `itemized/itemized_intake.md` and choose `standard`, `itemized`, or `unsure`. If you have rental income, also fill `rental/rental_intake.md`. You can place receipts or supporting documents in `itemized/` and `rental/`.
 
-At the beginning of the workflow, fill `itemized/itemized_intake.md` to choose `standard`, `itemized`, or `unsure`. If you choose standard, you can leave the rest blank unless you want a state or comparison review. If you choose itemized or unsure, fill the Schedule A sections and place supporting itemized deduction documents in `itemized/`, such as medical receipts, property tax bills, Form 1098 mortgage interest statements, charitable receipts, DMV registration bills, and state tax payment confirmations. Codex uses that file and the supporting documents to update `deductions.standard_or_itemized`, `deductions.itemized`, `deductions.itemized_deduction_total`, and California itemized deduction review fields when applicable.
+**User:** I filled both files and added property tax, mortgage 1098, charity receipts, rent ledger, repair invoice, and prior return.
 
-If rental income is in scope, fill `rental/rental_intake.md` and place supporting rental documents in `rental/`, such as property tax bills, mortgage interest statements, insurance bills, HOA statements, repair invoices, rent ledgers, leases, closing statements, and depreciation schedules. Codex uses that file and the supporting documents to update `income.rentals_royalties_partnerships` with source-backed Schedule E facts.
+**Action:** The agent re-reads `summary.md`, `itemized/itemized_intake.md`, `rental/rental_intake.md`, supporting documents, and the prior-year return. It extracts source-backed facts into YAML.
 
-Infer required IRS forms:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/infer_required_irs_forms.py .
-```
-
-Calculate federal line values with OpenTaxSolver through `tenforty.otslib`:
-
-For itemized deductions or standard-versus-itemized comparison, calculate Schedule A after AGI is known or supplied. If AGI is not available yet, run `calculate_tax_lines.py` once to populate Form 1040 line 11, then run Schedule A and rerun `calculate_tax_lines.py` for final taxable income:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_schedule_a.py .
-```
-
-This writes `tax_forms/workpapers/schedule_a_report.yaml`, updates `calculated.form_line_values.f1040sa`, sets `deductions.itemized_deduction_total`, and chooses `deductions.selected_deduction_amount` when the user selected `unsure`. It covers common Schedule A lines and flags complex mortgage interest, investment interest, charitable limit, casualty, and state differences for review.
-
-For rental property depreciation, calculate the building depreciation first when the current-year amount is not already supplied by a prior-year depreciation schedule:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_rental_depreciation.py .
-```
-
-This writes `tax_forms/workpapers/rental_depreciation_report.yaml`, updates each rental property's `depreciation.current_depreciation`, records federal and California depreciation values, and prepares California rental depreciation addition/subtraction amounts for Schedule CA review.
-
-For rental or royalty activity, calculate Schedule E Part I next:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_schedule_e.py .
-```
-
-This writes `tax_forms/workpapers/schedule_e_report.yaml` and updates `calculated.form_line_values.f1040se` plus Schedule 1 line 5. If a rental has a loss, run the Form 8582 calculator before relying on Schedule E line 22.
-
-When a direct rental has a loss or prior-year unallowed passive loss, calculate Form 8582 next:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_form_8582.py .
-```
-
-This writes `tax_forms/workpapers/form_8582_report.yaml`, computes the common active-participation rental real estate passive-loss limit, updates Schedule E line 22, and carries the allowed rental result to Schedule 1 line 5.
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_tax_lines.py .
-```
-
-Infer California resident state forms when a CA return is in scope:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/infer_ca_state_forms.py .
-```
-
-This writes `tax_forms/required_state_forms.yaml`. The first state module targets California full-year resident Form 540 returns and marks residency, Schedule CA adjustments, AMT, use tax, special credits, and other user-specific items for review when needed.
-
-Calculate California resident line values with OpenTaxSolver:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/calculate_ca_lines.py .
-```
-
-This writes `tax_forms/workpapers/ca_calculation_report.yaml` and updates `calculated.form_line_values.ca540` and `ca540ca`.
-
-Validate the packet:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/validate_tax_data.py .
-```
-
-Generate missing fields into `summary.md` when the packet needs user-provided facts:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/generate_summary_template.py .
-```
-
-Open `summary.md` in your preferred text editor, fill the blank values, then ask Codex to re-read it and update `tax_forms/extracted_tax_data.yaml`.
-
-Download blank IRS PDFs from the inferred form plan:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/download_irs_forms.py . \
-  --include-review
-```
-
-Download blank California FTB PDFs from the inferred state plan:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/download_ca_forms.py . \
-  --include-review
-```
-
-Create or edit field maps under:
+**Files updated:**
 
 ```text
-tax_forms/workpapers/field_maps/
+tax_forms/source_manifest.yaml
+tax_forms/extracted_tax_data.yaml
+tax_forms/review_notes.md
 ```
 
-To generate a skeleton field map from a blank fillable PDF:
+**Agent:** I extracted wages, withholding, brokerage interest/dividends/capital gains, rental income/expenses, depreciation facts, itemized deduction facts, and prior-year passive loss carryover. One rental invoice may be an improvement rather than a repair, so I recorded it as a review item.
 
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/inspect_pdf_fields.py \
-  tax_forms/workpapers/blank_forms/irs/f1040.pdf \
-  --form-id f1040 \
-  --tax-year 2025 \
-  --output tax_forms/workpapers/field_maps/f1040_field_map.yaml
-```
+**Action:** The agent runs form inference with `scripts/infer_required_irs_forms.py .` and, when California is in scope, `scripts/infer_ca_state_forms.py .`.
 
-Skeleton maps include semantic suggestions from `us-tax-return-prep/assets/field_maps/federal/semantic_field_library.yaml` for covered federal forms. The executing agent still needs to connect those suggestions to the current PDF's physical field names and validate the result.
-
-For California forms, use the CA blank-form directory and field-map directory:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/inspect_pdf_fields.py \
-  tax_forms/workpapers/blank_forms/ca/2025-540.pdf \
-  --form-id ca540 \
-  --tax-year 2025 \
-  --output tax_forms/workpapers/field_maps/ca/ca540_field_map.yaml
-```
-
-Covered California forms use semantic suggestions from `us-tax-return-prep/assets/field_maps/ca/semantic_field_library.yaml`.
-
-For Schedule E, generate the default current IRS field map:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/generate_schedule_e_field_map.py . \
-  --tax-year 2025
-```
-
-Then run validation after `f1040se.pdf` is downloaded so any IRS field-name revision is caught before filling.
-
-For Schedule A, generate the default current IRS field map:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/generate_schedule_a_field_map.py . \
-  --tax-year 2025
-```
-
-Then run validation after `f1040sa.pdf` is downloaded so any IRS field-name revision is caught before filling.
-
-For Form 8582, generate the default current IRS field map:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/generate_form_8582_field_map.py . \
-  --tax-year 2025
-```
-
-Then regenerate filled PDFs:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/regenerate_tax_pdfs.py . \
-  --overwrite
-```
-
-Generated PDFs go under each form's `output_dir`, usually `tax_forms/federal/`. The fill manifest is written to:
+**Files updated:**
 
 ```text
+tax_forms/required_irs_forms.yaml
+tax_forms/required_state_forms.yaml
+```
+
+Example inferred forms:
+
+- Form 1040
+- Schedule A
+- Schedule D
+- Form 8949 review
+- Schedule E
+- Form 8582
+- California Form 540
+- Schedule CA
+
+**Agent:** I need AGI before final Schedule A limits. I’ll run the federal calculator once, calculate Schedule A, then rerun federal totals.
+
+**Action:** The agent runs `scripts/calculate_tax_lines.py .` and `scripts/calculate_schedule_a.py .`.
+
+**Files generated or updated:**
+
+```text
+tax_forms/workpapers/calculation_report.yaml
+tax_forms/workpapers/schedule_a_report.yaml
+tax_forms/extracted_tax_data.yaml
+```
+
+**Agent:** Schedule A itemized deductions are larger than the standard deduction, so I selected itemized. I applied the medical threshold and SALT cap, and flagged mortgage or charity items only if they need review.
+
+**Agent:** Now I’ll calculate rental depreciation, Schedule E, and passive loss limits.
+
+**Action:** The agent runs:
+
+```text
+scripts/calculate_rental_depreciation.py .
+scripts/calculate_schedule_e.py .
+scripts/calculate_form_8582.py .
+scripts/calculate_tax_lines.py .
+scripts/calculate_ca_lines.py .
+```
+
+**Files generated or updated:**
+
+```text
+tax_forms/workpapers/rental_depreciation_report.yaml
+tax_forms/workpapers/schedule_e_report.yaml
+tax_forms/workpapers/form_8582_report.yaml
+tax_forms/workpapers/calculation_report.yaml
+tax_forms/workpapers/ca_calculation_report.yaml
+tax_forms/extracted_tax_data.yaml
+```
+
+**Agent:** Calculations are done. Please review `tax_forms/extracted_tax_data.yaml`, especially the review items for the repair/improvement classification and any California differences. Once you approve, I can download blank PDFs and generate draft filled forms.
+
+**User:** Looks good, generate draft PDFs.
+
+**Action:** The agent downloads blank forms, generates default field maps for covered forms, and validates the packet:
+
+```text
+scripts/download_irs_forms.py . --include-review
+scripts/download_ca_forms.py . --include-review
+scripts/generate_schedule_a_field_map.py . --tax-year 2025
+scripts/generate_schedule_e_field_map.py . --tax-year 2025
+scripts/generate_form_8582_field_map.py . --tax-year 2025
+scripts/validate_tax_data.py .
+```
+
+**Files generated:**
+
+```text
+tax_forms/workpapers/blank_forms/irs/f1040.pdf
+tax_forms/workpapers/blank_forms/irs/f1040sa.pdf
+tax_forms/workpapers/blank_forms/irs/f1040se.pdf
+tax_forms/workpapers/blank_forms/irs/f8582.pdf
+tax_forms/workpapers/blank_forms/ca/2025-540.pdf
+tax_forms/workpapers/field_maps/f1040sa_field_map.yaml
+tax_forms/workpapers/field_maps/f1040se_field_map.yaml
+tax_forms/workpapers/field_maps/f8582_field_map.yaml
+tax_forms/workpapers/validation_report.yaml
+```
+
+**Agent:** Validation passed except for two review warnings. I’ll generate draft PDFs now.
+
+**Action:** The agent runs `scripts/regenerate_tax_pdfs.py . --overwrite` and `scripts/generate_review_report.py .`.
+
+**Files generated:**
+
+```text
+tax_forms/federal/2025_f1040_draft.pdf
+tax_forms/federal/2025_f1040sa_draft.pdf
+tax_forms/federal/2025_f1040se_draft.pdf
+tax_forms/federal/2025_f8582_draft.pdf
+tax_forms/state/ca/2025_ca540_draft.pdf
+tax_forms/review_report.md
 tax_forms/workpapers/filled_pdf_manifest.yaml
 ```
 
-To regenerate only California state forms, pass the state plan. Per-form `blank_dir` and `field_map_dir` entries in `required_state_forms.yaml` point to the CA folders:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/regenerate_tax_pdfs.py . \
-  --forms-plan tax_forms/required_state_forms.yaml \
-  --overwrite
-```
-
-Generate a human-readable review report:
-
-```bash
-/path/to/us-tax-skill/.venv/bin/python -B \
-  /path/to/us-tax-skill/us-tax-return-prep/scripts/generate_review_report.py .
-```
+**Agent:** Draft return artifacts are ready. The key files are `tax_forms/extracted_tax_data.yaml`, `tax_forms/review_report.md`, and the draft PDFs under `tax_forms/federal/` and `tax_forms/state/ca/`. Two items still need human review before relying on the return: the rental repair vs improvement classification and one charitable contribution limit note.
 
 ## Standalone PDF Regeneration
 
