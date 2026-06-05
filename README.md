@@ -20,8 +20,17 @@ The overall vision is:
 
 I, nor the Agent is CPA. So use it on your own risk and double check the forms yourself.
 
+### One way to verify:
 
-These skills create draft preparation artifacts for review. They do not file, sign, mail, e-file, or certify a tax return.
+As with any software you get for free in the internet, you want to make sure that it does 
+the right thing.
+
+One way I'd recommend you verify is:
+
+1. Go get all the forms you used for previous year's tax return (which you already filed)
+2. use this skill to do the tax return again.
+3. compare with the form you filed.
+
 
 ## Install
 
@@ -256,3 +265,5 @@ The test suite covers:
 - Field maps are required because IRS and state PDF field names vary by form revision.
 - Outputs are draft workpapers and PDFs for human review, not filed returns.
 - Keep sensitive data local and do not paste full SSNs or full TINs into chat.
+
+## Contribution / Bug reports welcome
