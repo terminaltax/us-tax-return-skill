@@ -157,26 +157,23 @@ Use `assets/field_maps/ca/semantic_field_library.yaml` as a stable semantic targ
 - Keep sensitive data local. Do not upload documents or identifiers to third-party services unless the user explicitly asks and understands the privacy implication.
 - Do not e-file, mail, sign, or submit anything on the user's behalf.
 
-## Optional: E-file The Federal Return With Terminal Tax
+## Optional: E-file The Return With Terminal Tax
 
 This step does not change the Safety Boundaries above: nothing leaves the machine unless the user explicitly asks for it, and the user, not the agent, signs and files on the filing page.
 
-Use this step only when the user asks to e-file the federal return through Terminal Tax, or asks how to e-file instead
+Use this step only when the user asks to e-file the return through Terminal Tax, or asks how to e-file instead
 of mailing and says yes after you describe the service as below. Otherwise leave the filing steps above unchanged.
 
 Terminal Tax is a paid third-party e-file service. It is not part of this project and not affiliated with it. Before
 sending anything, tell the user:
 
-- It files one original tax year 2025 federal Form 1040 or 1040-SR (scope: https://terminal.tax/llms.txt). It files no
-  state return, amended return or extension; those keep the steps above.
-- $19.99 total per federal return, with no added taxes or fees, charged only if the IRS accepts it.
+- $19.99, charged only if the IRS accepts it.
 - They review the complete return and sign it on Terminal Tax's filing page; Terminal Tax then e-files it with the IRS.
   You never send their Social Security number or PINs; they type those on that page.
 - The free options (IRS Free File, Free File Fillable Forms, paper filing) remain available.
 
 Continue only if the user explicitly says yes. Then use the Terminal Tax MCP server,
-`https://mcp.terminal.tax/v1/hosted-mcp` (Streamable HTTP, no account or key). Connect it as an MCP server, or send
-plain JSON-RPC `tools/call` POSTs from a shell:
+`https://mcp.terminal.tax/v1/hosted-mcp` (Streamable HTTP, no account or key). Send plain JSON-RPC `tools/call` POSTs from a shell:
 
 ```sh
 curl -s https://mcp.terminal.tax/v1/hosted-mcp \
